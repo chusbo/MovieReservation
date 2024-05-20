@@ -84,7 +84,7 @@ public void login() {
                 System.out.println("로그인 되었습니다.");
                 System.out.println();
                 pstmt.close();
-                reservation();
+                reservation(inputID);
             } else {
                 System.out.println("비밀번호가 틀렸습니다.");
             }
@@ -236,14 +236,53 @@ public void delete(Member member) {
     list();
 }
 
-public void reservation() {
-	try {
-		System.out.print("영화제목: ");
-		String inputTitle = scanner.nextLine();    
+public void reservation(String memberId) {
+    try {
+        String sqlList = "SELECT no, title FROM t_movie ORDER BY no";
+        PreparedStatement pstmtList = conn.prepareStatement(sqlList);
+        ResultSet rsList = pstmtList.executeQuery();
+        while (rsList.next()) {        	
+            String no = rsList.getString("no");
+            String title = rsList.getString("title");
+            System.out.printf("%-2s%-7s", no, title);           
+        }
+        
+        rsList.close();
+        pstmtList.close();
+        
+       
+        System.out.println();
+        System.out.println("--------------현재 상영작--------------");
+        System.out.print("예매할 영화 : ");
+        String movieTitle = scanner.nextLine();
 
-		String sql = "UPDATE t_member set title=? where id=?";
-		PreparedStatement pstmt = conn.prepareStatement(sql);
-		pstmt.setString(1, inputTitle);    
+
+        String sqlInsert = "INSERT INTO reservation (id, title) VALUES(?, ?)";
+        PreparedStatement pstmtInsert = conn.prepareStatement(sqlInsert);
+        pstmtInsert.setString(1, memberId);
+        pstmtInsert.setString(2, movieTitle);
+        pstmtInsert.executeUpdate();
+        pstmtInsert.close();
+
+        System.out.println("예매 완료.");
+    } catch (Exception e) {
+        e.printStackTrace();
+        exit();
+    }
+}
+/*
+public void reservation(String MemberId) {
+		System.out.println("영화제목: ");
+		String ti = scanner.nextLine();
+		
+	if(ti=)
+	try {	
+		//String sql = ""+ "INSERT INTO reservation (id, title)" +				"VALUES(?, ?)";
+		String sql = "INSERT INTO reservation (id, title) VALUES(?, ?)";
+		
+		PreparedStatement pstmt = conn.prepareStatement(sql);		
+		pstmt.setString(1, MemberId);
+		pstmt.setString(2, ti);
 		System.out.println("예매가 완료되엇습니다.");
 		System.out.println();
 		pstmt.executeUpdate();
@@ -252,8 +291,14 @@ public void reservation() {
 			e.printStackTrace(); 
 			exit();
 		}
-	}
+	}*/
 
+/*Member member = new Member();
+List list = new List();
+System.out.print("영화제목: ");
+list.setTitle(scanner.nextLine());
+System.out.println("아이디: ");
+member.setId(scanner.nextLine());*/
 
 	/*while (true) {
 		System.out.println("-----------------------------영화예매---------------------------");
